@@ -8,3 +8,5 @@ class bookingMgr {
         this.tel = myJson.tel
     }
 }
+
+module.exports = bookingMgr

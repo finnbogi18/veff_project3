@@ -7,9 +7,9 @@ class eventManager {
         this.capacity = myJson.capacity
         this.startDate = myJson.startDate
         this.endDate = myJson.endDate
-        this.bookings = myJson.bookings
+        this.bookings = []
     }
 
 }
 
-module.exports = eventMgr
+module.exports = eventManager
