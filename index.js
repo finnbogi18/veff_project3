@@ -1,3 +1,10 @@
+const http = require('http');
+const url = require('url');
+const eventMgr = require('./events.js')
+const bookingMgr = require('./bookings.js')
+const express = require('express')
+const app = express();
+
 //Sample data for Assignment 3
 
 //The following is an example of an array of two events. 
@@ -12,3 +19,10 @@ var bookings = [
     { id: 1, firstName: "Jane", lastName: "Doe", tel: "", email: "jane@doe.doe", spots: 1},
     { id: 2, firstName: "Meðaljón", lastName: "Jónsson", tel: "+3541111111", email: "mj@test.is", spots: 5}
 ];
+
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end('Hello world!');
+}).listen(3000)
+
+
