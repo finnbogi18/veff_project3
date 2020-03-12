@@ -1,14 +1,15 @@
 class eventManager {
-    constructor(myJson) {
-        this.id = myJson.id
+    constructor(myJson, nextEventID) {
+        this.id = nextEventID
         this.name = myJson.name
         this.description = myJson.description
         this.location = myJson.location
         this.capacity = myJson.capacity
-        this.startDate = myJson.startDate
-        this.endDate = myJson.endDate
+        this.startDate = new Date(myJson.startDate * 1000)
+        this.endDate = new Date(myJson.endDate * 1000)
         this.bookings = []
     }
+
 
 }
 
