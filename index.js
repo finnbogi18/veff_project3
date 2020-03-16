@@ -24,7 +24,7 @@ var bookings = [
     { id: 2, firstName: "Meðaljón", lastName: "Jónsson", tel: "+3541111111", email: "mj@test.is", spots: 5}
 ];
 
-app.get('/api/v1/event', function (req, res) {
+app.get('/api/v1/events', function (req, res) { // Read all events
     let tempEvents = JSON.parse(JSON.stringify(events));
     for (i = 0; i < tempEvents.length; i++) {
         delete tempEvents[i].bookings
@@ -34,7 +34,7 @@ app.get('/api/v1/event', function (req, res) {
     res.status(200).json(tempEvents)
   });
 
-app.get('/api/v1/event/:id', function (req, res) {
+app.get('/api/v1/events/:id', function (req, res) { // read individual event
     for (let i = 0; i < events.length; i++) {
         if (events[i].id == req.params.id) {
             res.status(200).json(events[i]);
@@ -45,18 +45,18 @@ app.get('/api/v1/event/:id', function (req, res) {
     res.status(404).json({'message':"Event with id " + req.params.id + " does not exists."})
 });
 
-app.post('/api/v1/event', (req, res) => {
+app.post('/api/v1/events', (req, res) => { // Create event
     if (req.body === undefined || req.body.name === undefined || req.body.capacity < 0 || req.body.startDate >= req.body.endDate) {
         res.status(400).json({'message': 'invalid event?'})
         return;
-    }
+    } 
     let newEvent = new Event(req.body, nextEventId)
     nextEventId++;
     events.push(newEvent)
     res.status(201).json(newEvent)
 });
 
-app.put('/api/v1/event/:id', (req, res) => {
+app.put('/api/v1/events/:id', (req, res) => { // update an event
     console.log("hallo")
     for (let i = 0; i < events.length; i++) {
         console.log(req.params.id)
@@ -72,7 +72,7 @@ app.put('/api/v1/event/:id', (req, res) => {
     res.status(404).json({'message': "Event with id " + req.params.id + " does not exists or already has bookings."});
 });
 
-app.delete('/api/v1/event/:id', (req, res) => {
+app.delete('/api/v1/events/:id', (req, res) => { // delete an event
     for (let i = 0; i < events.length; i++) {
         if ((events[i].id == req.params.id) && (events[i].bookings.length < 1)) {
             res.status(200).json(events[i])
@@ -83,7 +83,7 @@ app.delete('/api/v1/event/:id', (req, res) => {
     res.status(404).json({'message':"Event with id "+ req.params.id + " does not exist or already has bookings."})
 });
 
-app.delete('/api/v1/event', (req, res) => {
+app.delete('/api/v1/events', (req, res) => { // delete all events
     for (let i = 0; i < events.length; i++) {
         let tempBookings = []
         for (let j = 0; j < events[i].bookings.length; j++) {
