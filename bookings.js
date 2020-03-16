@@ -1,6 +1,6 @@
 class bookingMgr {
-    constructor(myJson) {
-        this.id = myJson.id
+    constructor(myJson, nextbookingid) {
+        this.id = nextbookingid
         this.firstName = myJson.firstName
         this.lastName = myJson.lastName
         this.spots = myJson.spots
