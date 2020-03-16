@@ -46,8 +46,8 @@ app.get('/api/v1/events/:id', function (req, res) { // read individual event
 });
 
 app.post('/api/v1/events', (req, res) => { // Create event
-    if (req.body === undefined || req.body.name === undefined || req.body.capacity < 0 || req.body.startDate >= req.body.endDate) {
-        res.status(400).json({'message': 'invalid event?'})
+    if (req.body === undefined || req.body.name === undefined || req.body.capacity < 0 || req.body.startDate >= req.body.endDate || (Number.isInteger(req.body.capacity) == false) || (Number.isInteger(req.body.startDate) == false) || (Number.isInteger(req.body.endDate) == false)) {
+        res.status(400).json({'message': 'Invalid parameters, some are missing or wrong inputs. Required params are: name, capacity, startDate, endDate.'})
         return;
     } 
     let newEvent = new Event(req.body, nextEventId)
@@ -101,7 +101,7 @@ app.delete('/api/v1/events', (req, res) => { // delete all events
     bookings = []
 });
 
-app.get('/api/v1/event/:id/booking', (req, res) => {
+app.get('/api/v1/events/:id/bookings', (req, res) => { // read all bookings for a specific event
     let found = false
     let tempBookings = []
     for (let i = 0; i < events.length; i++) {
@@ -111,7 +111,6 @@ app.get('/api/v1/event/:id/booking', (req, res) => {
                 for (let h = 0; h < bookings.length; h++) {
                     if (events[i].bookings[j] == bookings[h].id) {
                         tempBookings.push(bookings[h])
-                        hasBooking = true
                     }
                 }
             }
@@ -126,7 +125,7 @@ app.get('/api/v1/event/:id/booking', (req, res) => {
 });
     
 
-app.get('/api/v1/event/:eventId/booking/:bookingId', (req, res) => {
+app.get('/api/v1/events/:eventId/bookings/:bookingId', (req, res) => { // look up a specific booking in a specific event
     console.log(req.params)
     for (let i = 0; i < events.length; i++) {
         if (events[i].id == req.params.eventId) {
@@ -142,8 +141,8 @@ app.get('/api/v1/event/:eventId/booking/:bookingId', (req, res) => {
     res.status(404).json({'message':'Event with an id ' + req.params.eventId + ' or booking with id ' + req.params.bookingId + ' was not found.'})
 });
 
-app.post('/api/v1/event/:eventId/booking', (req, res) => {
-    if (req.body.firstName == undefined || req.body.lastName == undefined || req.body.spots == undefined || req.body.spots < 1) {
+app.post('/api/v1/events/:eventId/bookings', (req, res) => { // Create a booking
+    if (req.body.firstName == undefined || req.body.lastName == undefined || req.body.spots == undefined || req.body.spots < 1 || (Number.isInteger(req.body.spots) == false)) {
         res.status(400).json({'message':'Bad request, requires firstName, lastName, spots, tel/email.'})
         return;
     }
@@ -151,24 +150,46 @@ app.post('/api/v1/event/:eventId/booking', (req, res) => {
         res.status(400).json({'message':'Bad request, requires firstName, lastName, spots, tel/email.'})
         return;
     }
+    let tempBooking = new Booking(req.body, nextBookingID)
     for (let i = 0; i < events.length; i++) {
         if (events[i].id == req.params.eventId) {
-            if (events[i].spots == 0) {
-                res.status(400).json({'message':'the event with the id ' + req.params.eventId + ' is fully booked.'})
+            available_spots = calculate_available_capacity(events[i])
+            console.log(available_spots, tempBooking.spots);
+            if (available_spots < tempBooking.spots) {
+                res.status(400).json({'message':'the event with the id ' + req.params.eventId + ' doesnt have that many seats available.'})
+                return;
             } else {
-                let tempBooking = new Booking(req.body, nextBookingID)
                 console.log(tempBooking)
                 events[i].bookings.push(nextBookingID)
                 nextBookingID++
                 bookings.push(tempBooking)
                 res.status(201).json(tempBooking)
-                events[i].capacity = events[i].capacity - req.body.spots
+                return;
             }
         }
     }
+    res.status(404).json({'message':'Event not found'})
 });
 
-app.delete('/api/v1/event/:eventId/booking/:bookingId', (req, res) => {
+function calculate_available_capacity(event) {
+    let spots_taken = 0;
+    console.log(event, event.bookings, event.bookings.length);
+    for (let i = 0; i < event.bookings.length; i++) {
+        console.log(event.bookings[i])
+        booking_id = event.bookings[i];
+        let temp_spots;
+        for (let k = 0; k < bookings.length; k++){
+            if (bookings[k].id == booking_id){
+                temp_spots = bookings[k].spots
+            }
+        }
+        spots_taken = temp_spots + spots_taken;
+    };
+    let available_spots = event.capacity - spots_taken;
+    return available_spots;
+};
+
+app.delete('/api/v1/events/:eventId/bookings/:bookingId', (req, res) => { // delete a booking
     for (let i = 0; i < events.length; i++) {
         if (events[i].id == req.params.eventId) {
             for (let j = 0; j < events[i].bookings.length; j++) {
@@ -194,7 +215,7 @@ app.delete('/api/v1/event/:eventId/booking/:bookingId', (req, res) => {
     res.status(400).json({'message':'The event with the id ' + req.params.eventId + ' does not exists or the booking with id ' + req.params.bookingId + ' is not associated with the Event Id.'})
 })
 
-app.delete('/api/v1/event/:eventId/booking', (req, res) => {
+app.delete('/api/v1/events/:eventId/bookings', (req, res) => { // delete all bookings
     let deletedArr = []
     let found = false
     for (let i = 0; i < events.length; i++) {

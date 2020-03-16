@@ -1,0 +1,10 @@
+Ideas for testing:
+
+Try all methods(obvious...)
+Try to read an event that has been deleted
+try to read a booking that has been deleted
+try to read a booking of an event that has been deleted
+check if the capacity has changed after deleting a booking
+Try all sorts of strange inputs in the requests, int, float, string, array? code?(try to crash the server)
+Check if it is possible to change an event if someone has booked it
+Check if it is possible to change an event after all bookings have been deleted
