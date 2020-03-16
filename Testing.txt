@@ -8,3 +8,7 @@ check if the capacity has changed after deleting a booking
 Try all sorts of strange inputs in the requests, int, float, string, array? code?(try to crash the server)
 Check if it is possible to change an event if someone has booked it
 Check if it is possible to change an event after all bookings have been deleted
+
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
